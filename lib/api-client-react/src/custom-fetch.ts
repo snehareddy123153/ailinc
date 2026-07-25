@@ -216,10 +216,13 @@ export class ResponseParseError extends Error {
     cause: unknown,
     requestInfo: { method: string; url: string },
   ) {
-    super(
-      `Failed to parse response from ${requestInfo.method} ${response.url || requestInfo.url} ` +
-        `(${response.status} ${response.statusText}) as JSON`,
-    );
+    const isHtml = rawBody.trimStart().startsWith("<");
+    const statusMsg = response.status ? `(${response.status} ${response.statusText})` : "";
+    const message = isHtml
+      ? `Server returned HTML ${statusMsg}. Backend service may be restarting, please try again in a few seconds.`
+      : `Failed to parse response from ${requestInfo.method} ${response.url || requestInfo.url} ${statusMsg} as JSON`;
+
+    super(message);
     Object.setPrototypeOf(this, new.target.prototype);
 
     this.status = response.status;

@@ -32,4 +32,19 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
 
+// Global JSON error handler — guarantees Express always returns JSON errors
+app.use(
+  (
+    err: any,
+    _req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction,
+  ) => {
+    logger.error({ err }, "Unhandled server error");
+    res.status(err.status || 500).json({
+      error: err.message || "Internal server error",
+    });
+  },
+);
+
 export default app;
