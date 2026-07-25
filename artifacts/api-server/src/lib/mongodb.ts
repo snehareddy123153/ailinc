@@ -17,6 +17,19 @@ export async function connectMongoDB(): Promise<void> {
         connectTimeoutMS: 10000,
       });
       logger.info({ uri: safeUri }, "MongoDB connected");
+
+      // Clean up legacy indexes from previous schemas (e.g., username_1)
+      try {
+        const collection = mongoose.connection.collection("users");
+        const indexes = await collection.indexes().catch(() => []);
+        if (indexes.some((idx: any) => idx.name === "username_1")) {
+          await collection.dropIndex("username_1").catch(() => {});
+          logger.info("Dropped legacy username_1 index from users collection");
+        }
+      } catch (indexErr) {
+        logger.warn({ err: indexErr }, "Legacy index cleanup warning");
+      }
+
       return;
     } catch (err) {
       lastErr = err;

@@ -20,9 +20,8 @@ function formatUser(user: any) {
 }
 
 router.post("/auth/register", async (req, res): Promise<void> => {
+  const { name, email, password, company, phone } = req.body || {};
   try {
-    const { name, email, password, company, phone } = req.body;
-
     if (!name || !email || !password) {
       res.status(400).json({ error: "Name, email, and password are required." });
       return;
@@ -51,6 +50,34 @@ router.post("/auth/register", async (req, res): Promise<void> => {
       user: formatUser(user),
     });
   } catch (err: any) {
+    if (err.code === 11000) {
+      if (err.message?.includes("username")) {
+        try {
+          await User.collection.dropIndex("username_1");
+          // Retry insertion once after dropping legacy index
+          const user = await User.create({
+            name,
+            email: email.toLowerCase().trim(),
+            passwordHash: password,
+            role: "student",
+            company: company || "",
+            phone: phone || "",
+            enrollmentStatus: "new",
+            enrolledCourses: [],
+          });
+          res.status(201).json({
+            message: "Registration successful",
+            user: formatUser(user),
+          });
+          return;
+        } catch (retryErr: any) {
+          res.status(500).json({ error: retryErr.message || "Failed to register user" });
+          return;
+        }
+      }
+      res.status(409).json({ error: "An account with this email already exists." });
+      return;
+    }
     res.status(500).json({ error: err.message || "Failed to register user" });
   }
 });
