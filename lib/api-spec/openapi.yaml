@@ -1,0 +1,391 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: AI Linc Corporate Portal API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: training-programs
+    description: Corporate AI training programs
+  - name: trainers
+    description: Industry trainers and experts
+  - name: inquiries
+    description: Business and trainer inquiries
+  - name: stats
+    description: Portal statistics
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /training-programs:
+    get:
+      operationId: listTrainingPrograms
+      tags: [training-programs]
+      summary: List all training programs
+      responses:
+        "200":
+          description: List of training programs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrainingProgram"
+    post:
+      operationId: createTrainingProgram
+      tags: [training-programs]
+      summary: Create a training program
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrainingProgramInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingProgram"
+
+  /training-programs/{id}:
+    get:
+      operationId: getTrainingProgram
+      tags: [training-programs]
+      summary: Get a training program by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Training program
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingProgram"
+        "404":
+          description: Not found
+
+  /trainers:
+    get:
+      operationId: listTrainers
+      tags: [trainers]
+      summary: List all trainers
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of trainers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Trainer"
+    post:
+      operationId: createTrainer
+      tags: [trainers]
+      summary: Create a trainer profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrainerInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Trainer"
+
+  /trainers/{id}:
+    get:
+      operationId: getTrainer
+      tags: [trainers]
+      summary: Get a trainer by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Trainer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Trainer"
+        "404":
+          description: Not found
+
+  /inquiries:
+    get:
+      operationId: listInquiries
+      tags: [inquiries]
+      summary: List all inquiries
+      responses:
+        "200":
+          description: List of inquiries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Inquiry"
+    post:
+      operationId: submitInquiry
+      tags: [inquiries]
+      summary: Submit a business or trainer inquiry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InquiryInput"
+      responses:
+        "201":
+          description: Inquiry submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Inquiry"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [stats]
+      summary: Get portal statistics
+      responses:
+        "200":
+          description: Portal stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortalStats"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    TrainingProgram:
+      type: object
+      required: [id, title, description, category, duration, outcomes, benefits]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        duration:
+          type: string
+        level:
+          type: string
+        outcomes:
+          type: array
+          items:
+            type: string
+        benefits:
+          type: array
+          items:
+            type: string
+        imageUrl:
+          type: ["string", "null"]
+        featured:
+          type: boolean
+        createdAt:
+          type: string
+
+    TrainingProgramInput:
+      type: object
+      required: [title, description, category, duration, outcomes, benefits]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        duration:
+          type: string
+        level:
+          type: string
+        outcomes:
+          type: array
+          items:
+            type: string
+        benefits:
+          type: array
+          items:
+            type: string
+        imageUrl:
+          type: string
+        featured:
+          type: boolean
+
+    Trainer:
+      type: object
+      required: [id, name, title, category, bio, expertise, availability]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        title:
+          type: string
+        category:
+          type: string
+        bio:
+          type: string
+        expertise:
+          type: array
+          items:
+            type: string
+        experience:
+          type: string
+        availability:
+          type: string
+        rating:
+          type: number
+        sessionsCompleted:
+          type: integer
+        imageUrl:
+          type: ["string", "null"]
+        linkedin:
+          type: ["string", "null"]
+        featured:
+          type: boolean
+        createdAt:
+          type: string
+
+    TrainerInput:
+      type: object
+      required: [name, title, category, bio, expertise, availability]
+      properties:
+        name:
+          type: string
+        title:
+          type: string
+        category:
+          type: string
+        bio:
+          type: string
+        expertise:
+          type: array
+          items:
+            type: string
+        experience:
+          type: string
+        availability:
+          type: string
+        rating:
+          type: number
+        sessionsCompleted:
+          type: integer
+        imageUrl:
+          type: string
+        linkedin:
+          type: string
+        featured:
+          type: boolean
+
+    Inquiry:
+      type: object
+      required: [id, name, email, company, type, message, status, createdAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        company:
+          type: string
+        type:
+          type: string
+        message:
+          type: string
+        phone:
+          type: ["string", "null"]
+        status:
+          type: string
+        createdAt:
+          type: string
+
+    InquiryInput:
+      type: object
+      required: [name, email, company, type, message]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        company:
+          type: string
+        type:
+          type: string
+        message:
+          type: string
+        phone:
+          type: string
+
+    PortalStats:
+      type: object
+      required: [totalTrainers, totalPrograms, totalInquiries, featuredTrainers, featuredPrograms, trainerCategories]
+      properties:
+        totalTrainers:
+          type: integer
+        totalPrograms:
+          type: integer
+        totalInquiries:
+          type: integer
+        featuredTrainers:
+          type: integer
+        featuredPrograms:
+          type: integer
+        trainerCategories:
+          type: array
+          items:
+            type: object
+            required: [category, count]
+            properties:
+              category:
+                type: string
+              count:
+                type: integer
