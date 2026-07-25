@@ -28,6 +28,18 @@ export function AuthPage() {
   const [regCompany, setRegCompany] = useState("");
   const [regPhone, setRegPhone] = useState("");
 
+  async function parseResponseJson(res: Response) {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      if (!res.ok) {
+        throw new Error(`Server returned HTTP ${res.status}. Backend may be restarting, please try again in a few seconds.`);
+      }
+      throw new Error("Unexpected server response format");
+    }
+  }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -37,7 +49,7 @@ export function AuthPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
-      const data = await res.json();
+      const data = await parseResponseJson(res);
       if (!res.ok) throw new Error(data.error || "Login failed");
 
       login(data.user);
@@ -77,7 +89,7 @@ export function AuthPage() {
           phone: regPhone,
         }),
       });
-      const data = await res.json();
+      const data = await parseResponseJson(res);
       if (!res.ok) throw new Error(data.error || "Registration failed");
 
       login(data.user);
