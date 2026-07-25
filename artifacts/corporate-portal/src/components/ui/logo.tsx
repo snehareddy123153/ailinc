@@ -19,7 +19,7 @@ export function AiLincLogo({ className = "", showTagline = false, size = "md" }:
       <img
         src={logoImg}
         alt="AI LINC"
-        className={`${heights[size]} w-auto object-contain rounded-lg bg-white/95 px-2.5 py-1 shadow-md border border-white/20 hover:bg-white transition-colors`}
+        className={`${heights[size]} w-auto object-contain rounded-xl hover:opacity-90 transition-opacity drop-shadow-sm`}
       />
       {showTagline && (
         <p className="text-[11px] font-medium text-muted-foreground tracking-normal mt-1.5 pl-0.5">
