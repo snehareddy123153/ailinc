@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/auth-context";
 import { useLocation } from "wouter";
 import { Lock, Mail, User, Building, Phone, ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
+import { getApiUrl } from "@/lib/utils";
 
 export function AuthPage() {
   const [, setLocation] = useLocation();
@@ -31,7 +32,7 @@ export function AuthPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch(getApiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
@@ -65,7 +66,7 @@ export function AuthPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch("/api/auth/register", {
+      const res = await fetch(getApiUrl("/api/auth/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

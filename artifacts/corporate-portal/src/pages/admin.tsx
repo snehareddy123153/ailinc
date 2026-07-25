@@ -30,6 +30,8 @@ import {
   MessageSquare
 } from "lucide-react";
 
+import { getApiUrl } from "@/lib/utils";
+
 interface Student {
   id: string;
   name: string;
@@ -94,14 +96,14 @@ export function AdminPortal() {
     setIsLoading(true);
     try {
       // Fetch Stats
-      const statsRes = await fetch("/api/admin/dashboard-stats");
+      const statsRes = await fetch(getApiUrl("/api/admin/dashboard-stats"));
       if (statsRes.ok) {
         const statsData = await statsRes.json();
         setStats(statsData);
       }
 
       // Fetch Students
-      const url = `/api/admin/students?status=${statusFilter}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`;
+      const url = getApiUrl(`/api/admin/students?status=${statusFilter}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`);
       const studentsRes = await fetch(url);
       if (studentsRes.ok) {
         const studentsData = await studentsRes.json();
@@ -135,7 +137,7 @@ export function AdminPortal() {
     if (!selectedStudent) return;
     setIsUpdating(true);
     try {
-      const res = await fetch(`/api/admin/students/${selectedStudent.id}`, {
+      const res = await fetch(getApiUrl(`/api/admin/students/${selectedStudent.id}`), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
